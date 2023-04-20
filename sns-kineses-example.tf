@@ -72,25 +72,35 @@ resource "aws_glue_catalog_table" "example_table" {
   }
 }
 
-resource "aws_kinesis_firehose_delivery_stream" "example_stream" {
-  name        = "example_stream"
+# Criar um Kinesis Firehose Delivery Stream
+resource "aws_kinesis_firehose_delivery_stream" "kinesis_firehose_glue_delivery_stream" {
+  name = "kinesis_firehose_glue_delivery_stream"
   destination = "glue"
 
-  glue_configuration {
-    database_name = aws_glue_catalog_table.example_table.database_name
-    table_name    = aws_glue_catalog_table.example_table.name
+  # Definir a configuração do Glue
+  extended_s3_configuration {
+    role_arn = aws_iam_role.kinesis_firehose_glue_role.arn
+    bucket_arn = aws_s3_bucket.kinesis_firehose_glue_bucket.arn
+    prefix = "kinesis_firehose_glue_delivery_stream"
+    error_output_prefix = "kinesis_firehose_glue_delivery_stream/errors/"
+    buffer_size = 5
+    buffer_interval = 300
+  }
 
-    partition_configuration {
-      # Utilizar a coluna "dt" como chave de partição
-      partition_columns = ["dt"]
+  glue_configuration {
+    database_name = aws_glue_catalog_database.kinesis_firehose_glue_database.name
+    table_name = aws_glue_catalog_table.kinesis_firehose_glue_table.name
+    s3_backup_mode = "FailedDataOnly"
+    s3_backup_configuration {
+      role_arn = aws_iam_role.kinesis_firehose_glue_role.arn
+      bucket_arn = aws_s3_bucket.kinesis_firehose_glue_bucket.arn
+      prefix = "kinesis_firehose_glue_delivery_stream/backup/"
     }
   }
 
-  s3_configuration {
-    role_arn   = aws_iam_role.firehose_role.arn
-    bucket_arn = aws_s3_bucket.example_bucket.arn
-    prefix     = "data/"
-    buffer_size = 5
-    buffer_interval = 300
+  # Definir a configuração da fonte de dados do Kinesis Firehose
+  source {
+    kinesis_stream_arn = "arn:aws:kinesis:us-east-1:123456789012:stream/kinesis_firehose_stream"
+    role_arn = aws_iam_role.kinesis_firehose_glue_role.arn
   }
 }
