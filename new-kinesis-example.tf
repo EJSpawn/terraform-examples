@@ -39,3 +39,15 @@ resource "aws_kinesis_firehose_delivery_stream" "json_delivery_stream" {
     }
   }  
 }
+
+
+data_format_conversion_configuration {
+      input_format_configuration {
+        deserializer {
+          open_x_json_ser_de {
+            convert_dots_in_json_keys_to_underscores = true
+            field_paths                               = ["$.Message"]
+          }
+        }
+      }
+}
