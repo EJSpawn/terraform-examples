@@ -49,3 +49,18 @@ def test_create_partition(setup_glue_and_s3):
     assert partition["StorageDescriptor"]["SerdeInfo"]["SerializationLibrary"] == "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
     assert partition["StorageDescriptor"]["SerdeInfo"]["Parameters"]["serialization.format"] == "1"
     assert partition["StorageDescriptor"]["Columns"] == [{"Name": "example_column", "Type": "string"}]
+
+
+def test_create_s3_bucket():
+    with mock_s3():
+        # Configurar o cliente S3
+        s3 = boto3.client('s3', region_name='us-west-2')
+
+        # Criar um bucket S3 mockado
+        bucket_name = 'test-bucket'
+        s3.create_bucket(Bucket=bucket_name)
+
+        # Verificar se o bucket foi criado corretamente
+        response = s3.list_buckets()
+        bucket_names = [bucket['Name'] for bucket in response['Buckets']]
+        assert bucket_name in bucket_names
