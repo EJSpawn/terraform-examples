@@ -19,6 +19,14 @@ data class Pessoa(
     val dataCriacao: Int
 )
 
+// implementation("software.amazon.awssdk:sns:2.17.66")
+// plugins {
+//    kotlin("jvm") version "1.6.0"
+//    kotlin("plugin.serialization") version "1.6.0"
+// } 
+//
+//implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
+//
 fun main() {
     val dataAtual = LocalDateTime.now()
     val dataCriacao = dataAtual.format(DateTimeFormatter.ofPattern("yyyyMMdd")).toInt()
