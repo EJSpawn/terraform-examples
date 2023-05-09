@@ -1,12 +1,46 @@
-import aws.sdk.kotlin.services.sns.SnsClient;
-import aws.sdk.kotlin.services.sns.model.PublishRequest;
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToString
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.sns.SnsClient
+import software.amazon.awssdk.services.sns.model.PublishRequest
+import software.amazon.awssdk.services.sns.model.MessageAttributeValue
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
+@Serializable
+data class Pessoa(
+    val id: Int,
+    val nome: String,
+    val idade: Int,
+    @SerialName("email_pessoa")
+    val email: String,
+    val dataCriacao: Int
+)
 
 fun main() {
-    val snsClient = SnsClient { region = "us-east-1" } // Crie um cliente SNS
+    val dataAtual = LocalDateTime.now()
+    val dataCriacao = dataAtual.format(DateTimeFormatter.ofPattern("yyyyMMdd")).toInt()
+    val dataParticao = dataAtual.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")).toInt()
 
-    val topicArn = "arn:aws:sns:us-east-1:123456789012:my-topic" // ARN do tópico
+    val pessoa = Pessoa(1, "João", 25, "joao@email.com", dataCriacao)
 
-    val message = "Hello, world!" // Mensagem a ser publicada
+    val message = Json.encodeToString(pessoa)
+
+    // Configurar o cliente SNS
+    val snsClient = SnsClient.builder()
+        .region(Region.US_EAST_1)
+        .build()
+
+    // Substitua com o ARN do seu tópico SNS
+    val snsTopicArn = "arn:aws:sns:us-east-1:123456789012:meu-topico"
+
+    // Criar atributos de mensagem
+    val partitionKey = MessageAttributeValue.builder()
+        .dataType("String")
+        .stringValue("pessoa_${dataParticao}")
+        .build()
 
     val request = PublishRequest {
         topicArn = topicArn
