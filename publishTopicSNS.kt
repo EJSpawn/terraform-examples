@@ -50,10 +50,16 @@ fun main() {
         .stringValue("pessoa_${dataParticao}")
         .build()
 
-    val request = PublishRequest {
-        topicArn = topicArn
-        message = message
-    }
+    
+
+    // Criar e enviar o request
+    val publishRequest = PublishRequest.builder()
+        .topicArn(snsTopicArn)
+        .message(jsonString)
+        .messageAttributes(mapOf("partitionKey" to partitionKey))
+        .build()
+
+    val publishResponse = snsClient.publish(publishRequest)
 
     snsClient.publish(request) // Publica a mensagem no tópico
 }
