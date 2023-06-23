@@ -49,3 +49,18 @@ df_convertido = converter_colunas_para_timestamp(df, colunas_para_converter)
 
 # Exiba o DataFrame resultante
 df_convertido.show()
+
+
+import org.apache.spark.sql.DataFrame
+
+def dropColumns(df: DataFrame, colsToDrop: List[String]): DataFrame = {
+    var newDf = df
+    for (col <- colsToDrop) {
+        newDf = newDf.drop(col)
+    }
+    newDf
+}
+
+val df = ... // Seu DataFrame aqui
+val colsToDrop = List("col1", "col2", "col3") // Substitua pelos nomes das colunas que você deseja remover
+val newDf = dropColumns(df, colsToDrop)
