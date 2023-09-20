@@ -1,0 +1,19 @@
+MyEventRule:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      Description: 'Event rule to match specific event and trigger Lambda'
+      EventPattern:
+        source:
+          - "my.custom.source"
+        detail-type:
+          - "MyCustomDetailType"
+        detail:
+          "integration|Type":
+            - "TESTE"
+          "dateRange":
+            - "2022-01-01"
+            - "2023-01-01"
+      State: "ENABLED"
+      Targets:
+        - Arn: !GetAtt [MyLambdaFunction, Arn]
+          Id: "MyLambdaTarget"
